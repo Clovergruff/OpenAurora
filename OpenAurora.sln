@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAurora", "OpenAurora\OpenAurora.csproj", "{80F537F4-5C50-46C0-A01E-EBC276582BDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80F537F4-5C50-46C0-A01E-EBC276582BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80F537F4-5C50-46C0-A01E-EBC276582BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80F537F4-5C50-46C0-A01E-EBC276582BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80F537F4-5C50-46C0-A01E-EBC276582BDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A2D05161-4D62-46AA-8ADC-CF4F83CD5917}
+	EndGlobalSection
+EndGlobal
