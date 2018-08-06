@@ -10,7 +10,7 @@ namespace OpenAurora
 	{
 		static void Main(string[] args)
 		{
-			OpenTK.GameWindow window = new OpenTK.GameWindow(Screen.width, Screen.height);
+			OpenTK.GameWindow window = new OpenTK.GameWindow(Screen.width, Screen.height, new OpenTK.Graphics.GraphicsMode(32, 8, 0, 0));
 
 			Game game = new Game(window);
 			window.Run(1d / 60d);

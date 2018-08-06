@@ -20,8 +20,10 @@ namespace OpenAurora
 		public Game(GameWindow win)
 		{
 			window = win;
+			window.Title = "Open Aurora";
 
 			window.Load += OnLoad;
+			window.Unload += UnLoad;
 			window.UpdateFrame += Update;
 			window.RenderFrame += Render;
 
@@ -31,12 +33,32 @@ namespace OpenAurora
 		// Load resources
 		void OnLoad(object sender, EventArgs e)
 		{
-			// GL.Enable(EnableCap.DepthTest);
-			// GL.DepthFunc(DepthFunction.Lequal);
+			Draw.Rect(new Vector2(32, 32), new Vector2(64, 64), 0, Color.White);
+
+			Draw.VBO = GL.GenBuffer();
+			GL.BindBuffer(BufferTarget.ArrayBuffer, Draw.VBO);
+			GL.BufferData<Vertex>(BufferTarget.ArrayBuffer, (IntPtr)(Vertex.SizeInBytes * Draw.vertices.Length),
+				Draw.vertices, BufferUsageHint.StaticDraw);
+
+			Draw.IBO = GL.GenBuffer();
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, Draw.IBO);
+			GL.BufferData<uint>(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * Draw.indices.Length),
+				Draw.indices, BufferUsageHint.StaticDraw);
+
+			GL.Enable(EnableCap.Blend);
+			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+			GL.Enable(EnableCap.DepthTest);
+			GL.DepthFunc(DepthFunction.Lequal);
 
 			GL.Enable(EnableCap.Texture2D);
 
 			Resources.Load();
+		}
+
+		void UnLoad(object sender, EventArgs e)
+		{
+			Resources.Clear();
 		}
 
 		// Input
@@ -74,9 +96,18 @@ namespace OpenAurora
 		void Render(object sender, EventArgs e)
 		{
 			GL.ClearColor(0.2f, 0.2f, 0.25f, 1f);
-			GL.Clear(ClearBufferMask.ColorBufferBit);
+			GL.ClearDepth(1);
+			GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+			// Render the world
+			//Matrix4 worldProjMatrix = Matrix4.CreatePerspectiveFieldOfView()
 			RenderWorld();
+
+			// Render the UI
+			Matrix4 uiProjMatrix = Matrix4.CreateOrthographicOffCenter(0, window.Width, window.Height, 0, -100, 100);
+			GL.MatrixMode(MatrixMode.Projection);
+			GL.LoadMatrix(ref uiProjMatrix);
+
 			RenderUI();
 			RenderConsole();
 
@@ -93,8 +124,27 @@ namespace OpenAurora
 
 		void RenderUI()
 		{
-			//Draw.Triangle2D(new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0.5f));
-			Draw.Rect(new Vector2(0, 0), new Vector2(64, 64), Color.White, Resources.GetTexture("Icon"));
+			//GL.BindTexture(TextureTarget.Texture2D, Resources.GetTexture("Icon").id);
+
+			GL.EnableClientState(ArrayCap.VertexArray);
+			GL.EnableClientState(ArrayCap.TextureCoordArray);
+			GL.EnableClientState(ArrayCap.ColorArray);
+			GL.EnableClientState(ArrayCap.NormalArray);
+			GL.EnableClientState(ArrayCap.IndexArray);
+
+			GL.VertexPointer(	3, VertexPointerType.Float,		Vertex.SizeInBytes, 0);
+			GL.TexCoordPointer(	2, TexCoordPointerType.Float,	Vertex.SizeInBytes, Vector3.SizeInBytes);
+			GL.NormalPointer(	   NormalPointerType.Float,		Vertex.SizeInBytes, Vector3.SizeInBytes + Vector2.SizeInBytes);
+			GL.ColorPointer(	4, ColorPointerType.Float,		Vertex.SizeInBytes, Vector3.SizeInBytes * 2 + Vector2.SizeInBytes);
+
+			GL.BindBuffer(BufferTarget.ArrayBuffer, Draw.VBO);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, Draw.IBO);
+			GL.DrawElements(PrimitiveType.Triangles, Draw.indices.Length, DrawElementsType.UnsignedInt, 0);
+			//GL.DrawArrays(PrimitiveType.Triangles, 0, Draw.vertices.Length);
+
+			//Draw.Triangle2D(new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0.5f), Color.White);
+			//Draw.Rect(new Vector2(64, 64), new Vector2(128, 128), 0, Color.White, Resources.GetTexture("Icon"));
+			//Draw.Rect(new Vector2(0, 0), new Vector2(128, 128), 0.5f, Color.White, Resources.GetTexture("Icon"));
 
 			// The UI is a seperate draw method in order to avoid game elements from bleeding into the UI
 		}

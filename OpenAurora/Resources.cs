@@ -17,7 +17,16 @@ namespace OpenAurora
 
 		public static void Load()
 		{
-			textures.Add(LoadTexture("Data/Textures/Icon.png"));
+			// Load all textures
+			string[] texPaths = System.IO.Directory.GetFiles("Data/Textures", "*.png", SearchOption.AllDirectories);
+			foreach (var path in texPaths)
+			{
+				LoadTexture(path);
+			}
+		}
+		public static void Clear()
+		{
+
 		}
 
 		public static Texture2D LoadTexture(string filePath)
@@ -46,7 +55,7 @@ namespace OpenAurora
 			Texture2D tex = new Texture2D(id, bitmap.Width, bitmap.Height);
 			tex.name = Path.GetFileNameWithoutExtension(filePath);
 
-			Console.WriteLine(filePath + " loaded, called " + tex.name);
+			textures.Add(tex);
 
 			return tex;
 		}
@@ -60,6 +69,17 @@ namespace OpenAurora
 			}
 
 			return null;
+		}
+		public static void RemoveTexture(string texName)
+		{
+			foreach (var tex in textures)
+			{
+				if (tex.name == texName)
+				{
+					textures.Remove(tex);
+					break;
+				}
+			}
 		}
 	}
 }
