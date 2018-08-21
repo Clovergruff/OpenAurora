@@ -54,6 +54,10 @@ namespace OpenAurora
 		}
 	}
 
+	public class Material
+	{
+		public Texture2D texture;
+	}
 	public class Texture2D
 	{
 		public string name;
@@ -114,8 +118,20 @@ namespace OpenAurora
 			
 		}
 
-		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale)
+		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, Texture2D tex = null)
 		{
+			int texId = 0;
+			if (tex != null)
+				texId = tex.id;
+			GL.BindTexture(TextureTarget.Texture2D, texId);
+
+			Matrix4 modelViewMatrix =
+				Matrix4.CreateScale(scale) *
+				Matrix4.CreateFromQuaternion(rot) *
+				Matrix4.CreateTranslation(pos);
+			GL.MatrixMode(MatrixMode.Modelview);
+			GL.LoadMatrix(ref modelViewMatrix);
+
 			GL.EnableClientState(ArrayCap.VertexArray);
 			GL.EnableClientState(ArrayCap.TextureCoordArray);
 			GL.EnableClientState(ArrayCap.ColorArray);
@@ -168,13 +184,15 @@ namespace OpenAurora
 	{
 		public static Mesh Rectangle(Vector3 pos, Vector3 size, Color col)
 		{
+			Vector3 halfSize = size * 0.5f;
+
 			return new Mesh("Rectangle",
 			  new Vertex[4]
 			  {
-				new Vertex(new Vector3(pos.X,			pos.Y,			pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + size.X,	pos.Y,			pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + size.X,	pos.Y + size.Y,	pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X,			pos.Y + size.Y,	pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
+				new Vertex(new Vector3(pos.X - halfSize.X,	pos.Y - halfSize.Y, pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
+				new Vertex(new Vector3(pos.X + halfSize.X,	pos.Y - halfSize.Y, pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
+				new Vertex(new Vector3(pos.X + halfSize.X,	pos.Y + halfSize.Y,	pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
+				new Vertex(new Vector3(pos.X - halfSize.X,	pos.Y + halfSize.Y,	pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
 			  },
 			  new uint[6]
 			  {

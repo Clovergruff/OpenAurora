@@ -59,6 +59,8 @@ namespace OpenAurora
 			GL.TexParameter(TextureTarget.Texture2D,
 				TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
 
+			GL.BindTexture(TextureTarget.Texture2D, 0);
+
 			Texture2D tex = new Texture2D(id, bitmap.Width, bitmap.Height);
 			tex.name = Path.GetFileNameWithoutExtension(filePath);
 
