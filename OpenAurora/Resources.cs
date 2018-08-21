@@ -14,6 +14,9 @@ namespace OpenAurora
 	public class Resources
 	{
 		public static List<Texture2D> textures = new List<Texture2D>();
+		public static List<Mesh> meshes = new List<Mesh>();
+		public static List<Font> fonts = new List<Font>();
+		public static List<Font> soundClips = new List<Font>();
 
 		public static void Load()
 		{
@@ -26,9 +29,13 @@ namespace OpenAurora
 		}
 		public static void Clear()
 		{
-
+			textures.Clear();
+			meshes.Clear();
+			fonts.Clear();
+			soundClips.Clear();
 		}
 
+		#region Textures
 		public static Texture2D LoadTexture(string filePath)
 		{
 			Bitmap bitmap = new Bitmap(filePath);
@@ -81,5 +88,38 @@ namespace OpenAurora
 				}
 			}
 		}
+		#endregion
+		#region Meshes
+		public static Mesh LoadMesh(string filePath)
+		{
+			return null;
+		}
+		public Mesh GetMesh()
+		{
+			return null;
+		}
+		public void RemoveMesh()
+		{
+
+		}
+		#endregion
+		#region Fonts
+		public static Font LoadFont(string filePath)
+		{
+			return null;
+		}
+		public Mesh GetFont()
+		{
+			return null;
+		}
+		public void RemoveFont()
+		{
+
+		}
+		#endregion
+		#region Audio
+		#endregion
+		#region Animations
+		#endregion
 	}
 }

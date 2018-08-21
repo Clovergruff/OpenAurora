@@ -16,6 +16,8 @@ namespace OpenAurora
 		public static GameWindow window;
 		public static List<Entity> entities = new List<Entity>();
 		public static List<Pawn> pawns = new List<Pawn>();
+
+		public Mesh rectangleMesh = Primitives.Rectangle(new Vector3(0, 0, 0), new Vector3(64, 64, 0), Color.White);
 		
 		public Game(GameWindow win)
 		{
@@ -33,18 +35,6 @@ namespace OpenAurora
 		// Load resources
 		void OnLoad(object sender, EventArgs e)
 		{
-			Draw.Rect(new Vector2(32, 32), new Vector2(64, 64), 0, Color.White);
-
-			Draw.VBO = GL.GenBuffer();
-			GL.BindBuffer(BufferTarget.ArrayBuffer, Draw.VBO);
-			GL.BufferData<Vertex>(BufferTarget.ArrayBuffer, (IntPtr)(Vertex.SizeInBytes * Draw.vertices.Length),
-				Draw.vertices, BufferUsageHint.StaticDraw);
-
-			Draw.IBO = GL.GenBuffer();
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, Draw.IBO);
-			GL.BufferData<uint>(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * Draw.indices.Length),
-				Draw.indices, BufferUsageHint.StaticDraw);
-
 			GL.Enable(EnableCap.Blend);
 			GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
@@ -107,8 +97,8 @@ namespace OpenAurora
 			Matrix4 uiProjMatrix = Matrix4.CreateOrthographicOffCenter(0, window.Width, window.Height, 0, -100, 100);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadMatrix(ref uiProjMatrix);
-
 			RenderUI();
+
 			RenderConsole();
 
 			window.SwapBuffers();
@@ -124,22 +114,11 @@ namespace OpenAurora
 
 		void RenderUI()
 		{
+			Draw.Mesh(rectangleMesh, new Vector3(200, 0, 0), Quaternion.Identity, Vector3.One);
+
 			//GL.BindTexture(TextureTarget.Texture2D, Resources.GetTexture("Icon").id);
 
-			GL.EnableClientState(ArrayCap.VertexArray);
-			GL.EnableClientState(ArrayCap.TextureCoordArray);
-			GL.EnableClientState(ArrayCap.ColorArray);
-			GL.EnableClientState(ArrayCap.NormalArray);
-			GL.EnableClientState(ArrayCap.IndexArray);
-
-			GL.VertexPointer(	3, VertexPointerType.Float,		Vertex.SizeInBytes, 0);
-			GL.TexCoordPointer(	2, TexCoordPointerType.Float,	Vertex.SizeInBytes, Vector3.SizeInBytes);
-			GL.NormalPointer(	   NormalPointerType.Float,		Vertex.SizeInBytes, Vector3.SizeInBytes + Vector2.SizeInBytes);
-			GL.ColorPointer(	4, ColorPointerType.Float,		Vertex.SizeInBytes, Vector3.SizeInBytes * 2 + Vector2.SizeInBytes);
-
-			GL.BindBuffer(BufferTarget.ArrayBuffer, Draw.VBO);
-			GL.BindBuffer(BufferTarget.ElementArrayBuffer, Draw.IBO);
-			GL.DrawElements(PrimitiveType.Triangles, Draw.indices.Length, DrawElementsType.UnsignedInt, 0);
+			
 			//GL.DrawArrays(PrimitiveType.Triangles, 0, Draw.vertices.Length);
 
 			//Draw.Triangle2D(new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0.5f), Color.White);
