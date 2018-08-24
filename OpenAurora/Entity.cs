@@ -36,5 +36,11 @@ namespace OpenAurora
 		{
 
 		}
+
+		public static object Create()
+		{
+			var ent = new Entity();
+			return ent;
+		}
 	}
 }

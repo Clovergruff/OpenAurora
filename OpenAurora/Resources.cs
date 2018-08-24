@@ -17,6 +17,7 @@ namespace OpenAurora
 		public static List<Mesh> meshes = new List<Mesh>();
 		public static List<Font> fonts = new List<Font>();
 		public static List<Font> soundClips = new List<Font>();
+		public static List<AnimationClip> animations = new List<AnimationClip>();
 
 		public static void Load()
 		{
@@ -122,6 +123,18 @@ namespace OpenAurora
 		#region Audio
 		#endregion
 		#region Animations
+		public static AnimationClip LoadAnimation(string filePath)
+		{
+			return null;
+		}
+		public AnimationClip GetAnimation()
+		{
+			return null;
+		}
+		public void RemoveAnimation()
+		{
+
+		}
 		#endregion
 	}
 }

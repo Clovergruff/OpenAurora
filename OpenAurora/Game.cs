@@ -13,11 +13,16 @@ namespace OpenAurora
 {
 	class Game
 	{
+		public enum Mode
+		{
+			Game,
+			Editor,
+		}
+
 		public static GameWindow window;
 		public static List<Entity> entities = new List<Entity>();
 		public static List<Pawn> pawns = new List<Pawn>();
-
-		public Mesh rectangleMesh = Primitives.Rectangle(new Vector3(0, 0, 0), new Vector3(1, 1, 0), Color.White);
+		public static Mode mode;
 
 		public Game(GameWindow win)
 		{
@@ -31,11 +36,13 @@ namespace OpenAurora
 			window.Resize += OnResize;
 
 			window.MouseWheel += MouseWheel;
+
+			Console.Enable();
 		}
 
 		void OnResize(object sender, EventArgs e)
 		{
-			GL.Viewport(0, 0, window.Width, window.Height);
+			GL.Viewport(0, 0, Screen.width, Screen.height);
 		}
 
 		// Load resources
@@ -50,6 +57,10 @@ namespace OpenAurora
 			GL.Enable(EnableCap.Texture2D);
 
 			Resources.Load();
+
+			Console.Disable();
+
+			Start(sender, e);
 		}
 
 		void UnLoad(object sender, EventArgs e)
@@ -61,6 +72,14 @@ namespace OpenAurora
 		void MouseWheel(object sender, MouseWheelEventArgs e)
 		{
 			// TODO: MouseWheel
+		}
+
+		// Start of the game
+		void Start(object sender, EventArgs e)
+		{
+			// Let's create some first objects
+
+			// Var.camera = (Camera)Entity.Create();
 		}
 
 		// Update the game
@@ -77,7 +96,10 @@ namespace OpenAurora
 				entity.Update();
 			}
 
-			// 
+			// Base input
+			if (Input.GetKeyDown(Key.Tilde))
+				Console.Toggle();
+
 			if (Input.GetKey(Key.AltLeft) && Input.GetKeyDown(Key.F4))
 				window.Close();
 
@@ -103,7 +125,8 @@ namespace OpenAurora
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadMatrix(ref uiProjMatrix);
 			RenderUI();
-			RenderConsole();
+
+			Console.Render();
 
 			window.SwapBuffers();
 		}
@@ -114,7 +137,7 @@ namespace OpenAurora
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadMatrix(ref projection);
 
-			Draw.Mesh(rectangleMesh, new Vector3(0, 0, 0), Quaternion.FromEulerAngles(0, MathHelper.DegreesToRadians(Input.mousePosition.X), 0), new Vector3(64, 64, 64));
+			Draw.Mesh(Primitives.cube, new Vector3(0, 0, 0), Quaternion.FromEulerAngles(0, MathHelper.DegreesToRadians(Input.mousePosition.X), 0), new Vector3(0.5f, 0.5f, 0.5f));
 
 			foreach (var entity in entities)
 			{
@@ -124,26 +147,8 @@ namespace OpenAurora
 
 		void RenderUI()
 		{
-			Draw.Mesh(rectangleMesh, new Vector3(Input.mousePosition.X, Input.mousePosition.Y, 0), Quaternion.Identity, new Vector3(64, 64, 0),
+			Draw.Mesh(Primitives.rectangle, new Vector3(Input.mousePosition.X, Input.mousePosition.Y, 0), Quaternion.Identity, new Vector3(64, 64, 0),
 				Resources.GetTexture("Shade"));
-			Draw.Mesh(rectangleMesh, new Vector3(256, 32, 0), Quaternion.FromEulerAngles(0, 0, MathHelper.DegreesToRadians(45)), new Vector3(64, 128, 0));
-
-			//GL.BindTexture(TextureTarget.Texture2D, Resources.GetTexture("Icon").id);
-
-			
-			//GL.DrawArrays(PrimitiveType.Triangles, 0, Draw.vertices.Length);
-
-			//Draw.Triangle2D(new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 0.5f), Color.White);
-			//Draw.Rect(new Vector2(64, 64), new Vector2(128, 128), 0, Color.White, Resources.GetTexture("Icon"));
-			//Draw.Rect(new Vector2(0, 0), new Vector2(128, 128), 0.5f, Color.White, Resources.GetTexture("Icon"));
-
-			// The UI is a seperate draw method in order to avoid game elements from bleeding into the UI
 		}
-
-		void RenderConsole()
-		{
-			// We have to draw the console above everything else
-		}
-
 	}
 }
