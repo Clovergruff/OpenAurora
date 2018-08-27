@@ -118,6 +118,10 @@ namespace OpenAurora
 			
 		}
 
+		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, string texName)
+		{
+			Mesh(mesh, pos, rot, scale, Resources.GetTexture(texName));
+		}
 		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, Texture2D tex = null)
 		{
 			int texId = 0;
@@ -183,19 +187,38 @@ namespace OpenAurora
 	{
 		public static Mesh rectangle = CreateRectangle(new Vector3(0, 0, 0), new Vector3(1, 1, 0), Color.White);
 		public static Mesh cube = CreateCube(new Vector3(0, 0, 0), new Vector3(1, 1, 1), Color.White);
+		public static Mesh plane = CreatePlane(new Vector3(0, 0, 0), new Vector3(1, 0, 1), Color.White);
 
-		// Build classes
 		public static Mesh CreateRectangle(Vector3 pos, Vector3 size, Color col)
 		{
-			Vector3 halfSize = size * 0.5f;
+			Vector3 hs = size * 0.5f;
 
 			return new Mesh("Rectangle",
 			  new Vertex[4]
 			  {
-				new Vertex(new Vector3(pos.X - halfSize.X,	pos.Y - halfSize.Y, pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,	pos.Y - halfSize.Y, pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,	pos.Y + halfSize.Y,	pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,	pos.Y + halfSize.Y,	pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3( -hs.X, -hs.Y, 0), new Vector2(0, 0), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3(  hs.X, -hs.Y, 0), new Vector2(1, 0), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3(  hs.X,  hs.Y, 0), new Vector2(1, 1), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3( -hs.X,  hs.Y, 0), new Vector2(0, 1), new Vector3(0, 0, -1), col),
+			  },
+			  new uint[6]
+			  {
+				0, 1, 2,
+				0, 2, 3,
+			  });
+		}
+
+		public static Mesh CreatePlane(Vector3 pos, Vector3 size, Color col)
+		{
+			Vector3 hs = size * 0.5f;
+
+			return new Mesh("Plane",
+			  new Vertex[4]
+			  {
+				new Vertex(pos + new Vector3( -hs.X, 0, -hs.Z), new Vector2(0, 0), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3(  hs.X, 0, -hs.Z), new Vector2(1, 0), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3(  hs.X, 0,  hs.Z), new Vector2(1, 1), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3( -hs.X, 0,  hs.Z), new Vector2(0, 1), new Vector3(0, 1, 0), col),
 			  },
 			  new uint[6]
 			  {
@@ -206,61 +229,40 @@ namespace OpenAurora
 
 		public static Mesh CreateCube(Vector3 pos, Vector3 size, Color col)
 		{
-			Vector3 halfSize = size * 0.5f;
+			Vector3 hs = size * 0.5f;
 
 			return new Mesh("Cube",
-			  new Vertex[24]
-			  {
-				// Front
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y - halfSize.Y, pos.Z + halfSize.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y - halfSize.Y, pos.Z + halfSize.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y + halfSize.Y, pos.Z + halfSize.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y + halfSize.Y, pos.Z + halfSize.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
-
-				// Back
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y - halfSize.Y, pos.Z - halfSize.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y - halfSize.Y, pos.Z - halfSize.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y + halfSize.Y, pos.Z - halfSize.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y + halfSize.Y, pos.Z - halfSize.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
-
-				// Left
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
-				
-				// Right
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
-				
-				// Up
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
-				
-				// Down
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y - halfSize.Y, pos.Z), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X + halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(new Vector3(pos.X - halfSize.X,  pos.Y + halfSize.Y, pos.Z), new Vector2(0, 1), new Vector3(0, 0, -1), col),
+				new Vertex[]
+				{
+					new Vertex(new Vector3( -hs.X, -hs.Y, -hs.Z), new Vector2(0, 0), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3(  hs.X, -hs.Y, -hs.Z), new Vector2(1, 0), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3(  hs.X,  hs.Y, -hs.Z), new Vector2(1, 1), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3( -hs.X,  hs.Y, -hs.Z), new Vector2(0, 1), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3( -hs.X, -hs.Y,  hs.Z), new Vector2(0, 0), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3(  hs.X, -hs.Y,  hs.Z), new Vector2(1, 0), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3(  hs.X,  hs.Y,  hs.Z), new Vector2(1, 1), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3( -hs.X,  hs.Y,  hs.Z), new Vector2(0, 1), new Vector3(0, 0, 1), col),
 			  },
-			  new uint[36]
+			  new uint[]
 			  {
-				0,		1,		2,
-				0,		2,		3,
-				2,		3,		4,
-				3,		4,		5,
-				4,		5,		6,
-				5,		6,		7,
-				6,		7,		8,
-				7,		8,		9,
-				8,		9,		10,
-				9,		10,		11,
-				10,		11,		12,
-				11,		12,		13,
+				  //front
+					0, 7, 3,
+					0, 4, 7,
+					//back
+					1, 2, 6,
+					6, 5, 1,
+					//left
+					0, 2, 1,
+					0, 3, 2,
+					//right
+					4, 5, 6,
+					6, 7, 4,
+					//top
+					2, 3, 6,
+					6, 3, 7,
+					//bottom
+					0, 1, 5,
+					0, 5, 4
 			  });
 		}
 	}

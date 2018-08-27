@@ -38,6 +38,8 @@ namespace OpenAurora
 			window.MouseWheel += MouseWheel;
 
 			Console.Enable();
+
+			Input.CalculateMouse();
 		}
 
 		void OnResize(object sender, EventArgs e)
@@ -59,7 +61,6 @@ namespace OpenAurora
 			Resources.Load();
 
 			Console.Disable();
-
 			Start(sender, e);
 		}
 
@@ -79,15 +80,14 @@ namespace OpenAurora
 		{
 			// Let's create some first objects
 
-			// Var.camera = (Camera)Entity.Create();
+			new Camera();
 		}
 
 		// Update the game
 		void Update(object sender, EventArgs e)
 		{
 			// Input
-			MouseState mState = Mouse.GetCursorState();
-			Input.mousePosition = window.PointToClient(new Point(mState.X, mState.Y));
+			Input.CalculateMouse();
 			Input.state = Keyboard.GetState();
 
 			// Update all entities
@@ -121,11 +121,11 @@ namespace OpenAurora
 			RenderWorld();
 
 			// Draw the UI and the Console using the same projection matrix!
-			Matrix4 uiProjMatrix = Matrix4.CreateOrthographicOffCenter(0, window.Width, window.Height, 0, -100, 100);
 			GL.MatrixMode(MatrixMode.Projection);
+			Matrix4 uiProjMatrix = Matrix4.CreateOrthographicOffCenter(0, window.Width, window.Height, 0, -100, 100);
 			GL.LoadMatrix(ref uiProjMatrix);
-			RenderUI();
 
+			RenderUI();
 			Console.Render();
 
 			window.SwapBuffers();
@@ -133,11 +133,22 @@ namespace OpenAurora
 
 		void RenderWorld()
 		{
-			Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, window.Width / (float)window.Height, 1.0f, 64.0f);
+			if (Var.camera == null)
+				return;
+
+			Matrix4 projection = Var.camera.GetViewMatrix() * Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(Var.camera.fov), window.Width / (float)window.Height, 1.0f, 64.0f);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadMatrix(ref projection);
 
-			Draw.Mesh(Primitives.cube, new Vector3(0, 0, 0), Quaternion.FromEulerAngles(0, MathHelper.DegreesToRadians(Input.mousePosition.X), 0), new Vector3(0.5f, 0.5f, 0.5f));
+			float rot = MathHelper.DegreesToRadians(Input.mousePosition.X);
+
+			Draw.Mesh(Primitives.plane, new Vector3(0, 0, 0), Quaternion.Identity, new Vector3(32, 32, 32), "BlueWallB");
+
+			Draw.Mesh(Primitives.cube, new Vector3(0, 1, 0), Quaternion.Identity, new Vector3(1, 1, 1), "Shade");
+			Draw.Mesh(Primitives.cube, new Vector3(3, 1, 3), Quaternion.Identity, new Vector3(3, 4, 1), "Helper");
+			Draw.Mesh(Primitives.cube, new Vector3(-7, 1, -5), Quaternion.Identity, new Vector3(3, 4, 3), "Helper");
+			Draw.Mesh(Primitives.cube, new Vector3(-4, 2, 3), Quaternion.Identity, new Vector3(2, 2, 2), "Helper");
+			Draw.Mesh(Primitives.cube, new Vector3(0, 2, 0), Quaternion.Identity, new Vector3(0.5f, 4, 0.5f), "Cell");
 
 			foreach (var entity in entities)
 			{
@@ -147,8 +158,7 @@ namespace OpenAurora
 
 		void RenderUI()
 		{
-			Draw.Mesh(Primitives.rectangle, new Vector3(Input.mousePosition.X, Input.mousePosition.Y, 0), Quaternion.Identity, new Vector3(64, 64, 0),
-				Resources.GetTexture("Shade"));
+			// Draw.Mesh(Primitives.rectangle, new Vector3(Input.mousePosition.X, Input.mousePosition.Y, 0), Quaternion.Identity, new Vector3(64, 64, 0), "Shade");
 		}
 	}
 }

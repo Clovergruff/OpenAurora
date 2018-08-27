@@ -15,6 +15,8 @@ namespace OpenAurora
 		public static KeyboardState lastState;
 		public static KeyboardState state;
 		public static Point mousePosition;
+		public static Vector2 mouseDelta;
+		private static Point oldMousePos = Point.Empty;
 
 		public static bool GetKey(Key key)
 		{
@@ -27,6 +29,16 @@ namespace OpenAurora
 		public static bool GetKeyUp(Key key)
 		{
 			return state.IsKeyUp(key) && lastState.IsKeyDown(key);
+		}
+
+		public static void CalculateMouse()
+		{
+			MouseState mState = Mouse.GetState();
+			mousePosition = Game.window.PointToClient(new Point(mState.X, mState.Y));
+
+			mouseDelta = new Vector2(oldMousePos.X - mousePosition.X, oldMousePos.Y - mousePosition.Y);
+
+			oldMousePos = mousePosition;
 		}
 	}
 }
