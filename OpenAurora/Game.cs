@@ -62,6 +62,24 @@ namespace OpenAurora
 
 			Console.Disable();
 			Start(sender, e);
+
+			// Enable Light 0 and set its parameters.
+			/*GL.Light(LightName.Light0, LightParameter.Position, new float[] { 1.0f, 1.0f, -0.5f });
+			GL.Light(LightName.Light0, LightParameter.Ambient, new float[] { 0.3f, 0.3f, 0.3f, 1.0f });
+			GL.Light(LightName.Light0, LightParameter.Diffuse, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+			GL.Light(LightName.Light0, LightParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+			GL.Light(LightName.Light0, LightParameter.SpotExponent, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+			GL.LightModel(LightModelParameter.LightModelAmbient, new float[] { 0.2f, 0.2f, 0.2f, 1.0f });
+			GL.LightModel(LightModelParameter.LightModelTwoSide, 1);
+			GL.LightModel(LightModelParameter.LightModelLocalViewer, 1);
+			GL.Enable(EnableCap.Lighting);
+			GL.Enable(EnableCap.Light0);
+
+			// Use GL.Material to set your object's material parameters.
+			GL.Material(MaterialFace.Front, MaterialParameter.Ambient, new float[] { 0.3f, 0.3f, 0.3f, 1.0f });
+			GL.Material(MaterialFace.Front, MaterialParameter.Diffuse, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+			GL.Material(MaterialFace.Front, MaterialParameter.Specular, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+			GL.Material(MaterialFace.Front, MaterialParameter.Emission, new float[] { 0.0f, 0.0f, 0.0f, 1.0f });*/
 		}
 
 		void UnLoad(object sender, EventArgs e)
@@ -81,11 +99,25 @@ namespace OpenAurora
 			// Let's create some first objects
 
 			new Camera();
+			new Player();
+
+			CreateStaticObject(Vector3.Zero, Vector3.Zero, new Vector3(32, 0, 32), Primitives.plane, "BlueWallB");
+			CreateStaticObject(new Vector3(5, 2, 6), new Vector3(0, 60, 0), new Vector3(2, 4, 2), Primitives.cube, "Troop");
+			CreateStaticObject(new Vector3(8, 0, 0), new Vector3(45, 0, 0), new Vector3(8, 0, 8), Primitives.plane, "BlueWallB");
+		}
+
+		void CreateStaticObject(Vector3 pos, Vector3 rot, Vector3 scale, Mesh mesh, string Text)
+		{
+			var o = new Entity();
+			o.SetModel(mesh, Text);
+			o.SetTransform(pos, rot, scale);
 		}
 
 		// Update the game
 		void Update(object sender, EventArgs e)
 		{
+			Time.GetDeltaTime((FrameEventArgs)e);
+
 			// Input
 			Input.CalculateMouse();
 			Input.state = Keyboard.GetState();
@@ -139,17 +171,7 @@ namespace OpenAurora
 			Matrix4 projection = Var.camera.GetViewMatrix() * Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(Var.camera.fov), window.Width / (float)window.Height, 1.0f, 64.0f);
 			GL.MatrixMode(MatrixMode.Projection);
 			GL.LoadMatrix(ref projection);
-
-			float rot = MathHelper.DegreesToRadians(Input.mousePosition.X);
-
-			Draw.Mesh(Primitives.plane, new Vector3(0, 0, 0), Quaternion.Identity, new Vector3(32, 32, 32), "BlueWallB");
-
-			Draw.Mesh(Primitives.cube, new Vector3(0, 1, 0), Quaternion.Identity, new Vector3(1, 1, 1), "Shade");
-			Draw.Mesh(Primitives.cube, new Vector3(3, 1, 3), Quaternion.Identity, new Vector3(3, 4, 1), "Helper");
-			Draw.Mesh(Primitives.cube, new Vector3(-7, 1, -5), Quaternion.Identity, new Vector3(3, 4, 3), "Helper");
-			Draw.Mesh(Primitives.cube, new Vector3(-4, 2, 3), Quaternion.Identity, new Vector3(2, 2, 2), "Helper");
-			Draw.Mesh(Primitives.cube, new Vector3(0, 2, 0), Quaternion.Identity, new Vector3(0.5f, 4, 0.5f), "Cell");
-
+			
 			foreach (var entity in entities)
 			{
 				entity.Render();

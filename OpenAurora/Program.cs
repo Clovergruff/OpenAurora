@@ -10,10 +10,11 @@ namespace OpenAurora
 	{
 		static void Main(string[] args)
 		{
-			OpenTK.GameWindow window = new OpenTK.GameWindow(1024, 600, new OpenTK.Graphics.GraphicsMode(32, 8, 0, 0));
+			OpenTK.GameWindow window = new OpenTK.GameWindow(1024, 600, new OpenTK.Graphics.GraphicsMode(32, 8, 0, 4));
+			window.VSync = OpenTK.VSyncMode.Off;
 
 			Game game = new Game(window);
-			window.Run(1d / 60d);
+			window.Run(60, 60);
 		}
 	}
 }

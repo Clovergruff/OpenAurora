@@ -79,7 +79,7 @@ namespace OpenAurora
 			vertices = newVerts;
 			indices = newIds;
 
-			Init();
+			Bind();
 		}
 
 		public string name;
@@ -88,7 +88,7 @@ namespace OpenAurora
 		public Vertex[] vertices;
 		public uint[] indices;
 
-		public void Init()
+		public void Bind()
 		{
 			VBO = GL.GenBuffer();
 			GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
@@ -128,6 +128,8 @@ namespace OpenAurora
 			if (tex != null)
 				texId = tex.id;
 			GL.BindTexture(TextureTarget.Texture2D, texId);
+
+			mesh.Bind();
 
 			Matrix4 modelViewMatrix =
 				Matrix4.CreateScale(scale) *
@@ -196,10 +198,10 @@ namespace OpenAurora
 			return new Mesh("Rectangle",
 			  new Vertex[4]
 			  {
-				new Vertex(pos + new Vector3( -hs.X, -hs.Y, 0), new Vector2(0, 0), new Vector3(0, 0, -1), col),
-				new Vertex(pos + new Vector3(  hs.X, -hs.Y, 0), new Vector2(1, 0), new Vector3(0, 0, -1), col),
-				new Vertex(pos + new Vector3(  hs.X,  hs.Y, 0), new Vector2(1, 1), new Vector3(0, 0, -1), col),
-				new Vertex(pos + new Vector3( -hs.X,  hs.Y, 0), new Vector2(0, 1), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3( -hs.X, -hs.Y, 0), new Vector2(0, 1), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3(  hs.X, -hs.Y, 0), new Vector2(1, 1), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3(  hs.X,  hs.Y, 0), new Vector2(1, 0), new Vector3(0, 0, -1), col),
+				new Vertex(pos + new Vector3( -hs.X,  hs.Y, 0), new Vector2(0, 0), new Vector3(0, 0, -1), col),
 			  },
 			  new uint[6]
 			  {
@@ -215,10 +217,10 @@ namespace OpenAurora
 			return new Mesh("Plane",
 			  new Vertex[4]
 			  {
-				new Vertex(pos + new Vector3( -hs.X, 0, -hs.Z), new Vector2(0, 0), new Vector3(0, 1, 0), col),
-				new Vertex(pos + new Vector3(  hs.X, 0, -hs.Z), new Vector2(1, 0), new Vector3(0, 1, 0), col),
-				new Vertex(pos + new Vector3(  hs.X, 0,  hs.Z), new Vector2(1, 1), new Vector3(0, 1, 0), col),
-				new Vertex(pos + new Vector3( -hs.X, 0,  hs.Z), new Vector2(0, 1), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3( -hs.X, 0, -hs.Z), new Vector2(0, 1), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3(  hs.X, 0, -hs.Z), new Vector2(1, 1), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3(  hs.X, 0,  hs.Z), new Vector2(1, 0), new Vector3(0, 1, 0), col),
+				new Vertex(pos + new Vector3( -hs.X, 0,  hs.Z), new Vector2(0, 0), new Vector3(0, 1, 0), col),
 			  },
 			  new uint[6]
 			  {
@@ -234,35 +236,35 @@ namespace OpenAurora
 			return new Mesh("Cube",
 				new Vertex[]
 				{
-					new Vertex(new Vector3( -hs.X, -hs.Y, -hs.Z), new Vector2(0, 0), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3(  hs.X, -hs.Y, -hs.Z), new Vector2(1, 0), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3(  hs.X,  hs.Y, -hs.Z), new Vector2(1, 1), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3( -hs.X,  hs.Y, -hs.Z), new Vector2(0, 1), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3( -hs.X, -hs.Y,  hs.Z), new Vector2(0, 0), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3(  hs.X, -hs.Y,  hs.Z), new Vector2(1, 0), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3(  hs.X,  hs.Y,  hs.Z), new Vector2(1, 1), new Vector3(0, 0, 1), col),
-					new Vertex(new Vector3( -hs.X,  hs.Y,  hs.Z), new Vector2(0, 1), new Vector3(0, 0, 1), col),
+					new Vertex(new Vector3( -hs.X, -hs.Y, -hs.Z), new Vector2(0, 1), new Vector3(-1, -1, -1), col), // Left		Front	Down
+					new Vertex(new Vector3(  hs.X, -hs.Y, -hs.Z), new Vector2(1, 1), new Vector3( 1, -1, -1), col), // Right	Front	Down
+					new Vertex(new Vector3(  hs.X,  hs.Y, -hs.Z), new Vector2(1, 0), new Vector3( 1,  1,  1), col), // Right	Front	Up
+					new Vertex(new Vector3( -hs.X,  hs.Y, -hs.Z), new Vector2(0, 0), new Vector3(-1,  1,  1), col), // Left		Front	Up
+					new Vertex(new Vector3( -hs.X, -hs.Y,  hs.Z), new Vector2(0, 1), new Vector3(-1, -1, -1), col), // Left		Back	Down
+					new Vertex(new Vector3(  hs.X, -hs.Y,  hs.Z), new Vector2(1, 1), new Vector3( 1, -1, -1), col), // Right	Back	Down
+					new Vertex(new Vector3(  hs.X,  hs.Y,  hs.Z), new Vector2(1, 0), new Vector3( 1,  1,  1), col), // Right	Back	Up
+					new Vertex(new Vector3( -hs.X,  hs.Y,  hs.Z), new Vector2(0, 0), new Vector3(-1,  1,  1), col), // Left		Back	Up
 			  },
 			  new uint[]
 			  {
-				  //front
-					0, 7, 3,
-					0, 4, 7,
-					//back
-					1, 2, 6,
-					6, 5, 1,
-					//left
-					0, 2, 1,
-					0, 3, 2,
-					//right
-					4, 5, 6,
-					6, 7, 4,
-					//top
-					2, 3, 6,
-					6, 3, 7,
-					//bottom
-					0, 1, 5,
-					0, 5, 4
+				// Front
+				0, 7, 3,
+				0, 4, 7,
+				// Back
+				1, 2, 6,
+				6, 5, 1,
+				// Left
+				0, 2, 1,
+				0, 3, 2,
+				// Right
+				4, 5, 6,
+				6, 7, 4,
+				// Top
+				2, 3, 6,
+				6, 3, 7,
+				// Bottom
+				0, 1, 5,
+				0, 5, 4
 			  });
 		}
 	}

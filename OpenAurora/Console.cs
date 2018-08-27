@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,7 @@ namespace OpenAurora
 			if (!enabled)
 				return;
 
+			GL.BlendColor(1, 0, 1, 1);
 			Draw.Mesh(Primitives.rectangle, new Vector3(Screen.width * 0.5f, 64, 0), Quaternion.Identity, new Vector3(Screen.width, 128, 0));
 		}
 	}
