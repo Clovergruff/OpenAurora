@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using OpenTK;
 using OpenTK.Input;
+using OpenTK;
+using System.Drawing;
 
 namespace OpenAurora
 {
 	public class Player : Pawn
 	{
+		private Vector2 inputVec;
+
 		public override void Awake()
 		{
 			base.Awake();
@@ -33,15 +35,23 @@ namespace OpenAurora
 			if (Game.mode != Game.Mode.Game)
 				return;
 
+			inputVec = Vector2.Zero;
+
 			if (Input.GetKey(Key.A))
-				velocity.X -= 500 * Time.deltaTime;
+				inputVec.X = 1;
 			if (Input.GetKey(Key.D))
-				velocity.X += 500 * Time.deltaTime;
+				inputVec.X = -1;
 
 			if (Input.GetKey(Key.S))
-				velocity.Z += 500 * Time.deltaTime;
+				inputVec.Y = -1;
 			if (Input.GetKey(Key.W))
-				velocity.Z -= 500 * Time.deltaTime;
+				inputVec.Y = 1;
+
+			if (inputVec.Length > 0.1f)
+				inputVec.Normalize();
+
+
+			velocity += Quaternion.FromEulerAngles(0, MathHelper.DegreesToRadians(Var.camera.yaw), 0) * new Vector3(inputVec.X, 0, inputVec.Y) * 400 * Time.deltaTime;
 		}
 
 		public override void Render()

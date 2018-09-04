@@ -6,12 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
 namespace OpenAurora
 {
-	class Game
+	public class Game
 	{
 		public enum Mode
 		{
@@ -26,6 +27,8 @@ namespace OpenAurora
 
 		public Game(GameWindow win)
 		{
+			Var.game = this;
+
 			window = win;
 			window.Title = "Open Aurora";
 
@@ -58,7 +61,7 @@ namespace OpenAurora
 
 			GL.Enable(EnableCap.Texture2D);
 
-			Resources.Load();
+			Resources.LoadAssets();
 
 			Console.Disable();
 			Start(sender, e);
@@ -143,7 +146,7 @@ namespace OpenAurora
 		}
 
 		// Rendering
-		void Render(object sender, EventArgs e)
+		public void Render(object sender, EventArgs e)
 		{
 			GL.ClearColor(0.2f, 0.2f, 0.25f, 1f);
 			GL.ClearDepth(1);
@@ -159,6 +162,9 @@ namespace OpenAurora
 
 			RenderUI();
 			Console.Render();
+
+			if (Resources.loading)
+				RenderLoadingScreen();
 
 			window.SwapBuffers();
 		}
@@ -181,6 +187,12 @@ namespace OpenAurora
 		void RenderUI()
 		{
 			// Draw.Mesh(Primitives.rectangle, new Vector3(Input.mousePosition.X, Input.mousePosition.Y, 0), Quaternion.Identity, new Vector3(64, 64, 0), "Shade");
+		}
+
+		void RenderLoadingScreen()
+		{
+			Draw.Mesh(Primitives.CreateRectangle(Vector3.Zero, Vector3.One, new Color4(1, 0, 0, 1)),
+				new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0), Quaternion.Identity, new Vector3(Screen.width, Screen.height, 0));
 		}
 	}
 }

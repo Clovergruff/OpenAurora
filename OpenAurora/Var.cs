@@ -10,5 +10,6 @@ namespace OpenAurora
 	{
 		public static Player player;
 		public static Camera camera;
+		public static Game game;
 	}
 }

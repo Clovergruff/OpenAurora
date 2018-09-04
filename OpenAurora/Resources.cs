@@ -13,21 +13,104 @@ namespace OpenAurora
 {
 	public class Resources
 	{
+		public static int assetCount = 0;
+		public static bool loading = true;
+
 		public static List<Texture2D> textures = new List<Texture2D>();
 		public static List<Mesh> meshes = new List<Mesh>();
 		public static List<Font> fonts = new List<Font>();
 		public static List<Font> soundClips = new List<Font>();
 		public static List<AnimationClip> animations = new List<AnimationClip>();
 
-		public static void Load()
+		private const string textChars = @"qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM0123456789µ§½!""#¤%&/()=?^*@£€${[]}\~¨'-_.:,;<>|°©®±¥";
+
+		public class BitmapFont
 		{
-			// Load all textures
+			public string name;
+			public Bitmap bitmap;
+			public Font sourceFont;
+			public int size = 16;
+			public Size charSize;
+
+			public BitmapFont(string newName, int newFontSize)
+			{
+				name = newName;
+				size = newFontSize;
+				Generate(size, name, out charSize);
+			}
+
+			public Bitmap Generate(int fontSize, string fontName, out Size charSize)
+			{
+				var characters = new List<Bitmap>();
+				using (var font = new Font(fontName, fontSize))
+				{
+					for (int i = 0; i < textChars.Length; i++)
+					{
+						var charBmp = GenerateChar(font, textChars[i]);
+						characters.Add(charBmp);
+					}
+					charSize = new Size(characters.Max(x => x.Width), characters.Max(x => x.Height));
+					var charMap = new Bitmap(charSize.Width * characters.Count, charSize.Height);
+					using (var gfx = Graphics.FromImage(charMap))
+					{
+						gfx.FillRectangle(Brushes.Black, 0, 0, charMap.Width, charMap.Height);
+						for (int i = 0; i < characters.Count; i++)
+						{
+							var c = characters[i];
+							gfx.DrawImageUnscaled(c, i * charSize.Width, 0);
+
+							c.Dispose();
+						}
+					}
+					return charMap;
+				}
+			}
+
+			private Bitmap GenerateChar(Font font, char c)
+			{
+				var size = GetCharSize(font, c);
+				var bmp = new Bitmap((int)size.Width, (int)size.Height);
+				using (var gfx = Graphics.FromImage(bmp))
+				{
+					gfx.FillRectangle(Brushes.Black, 0, 0, bmp.Width, bmp.Height);
+					gfx.DrawString(c.ToString(), font, Brushes.White, 0, 0);
+				}
+				return bmp;
+			}
+			private SizeF GetCharSize(Font font, char c)
+			{
+				using (var bmp = new Bitmap(512, 512))
+				{
+					using (var gfx = Graphics.FromImage(bmp))
+					{
+						return gfx.MeasureString(c.ToString(), font);
+					}
+				}
+			}
+		}
+
+		public static void LoadAssets()
+		{
+			loading = true;
+			//string[] fontPaths = System.IO.Directory.GetFiles("Data/Fonts", "*.ttf", SearchOption.AllDirectories);
 			string[] texPaths = System.IO.Directory.GetFiles("Data/Textures", "*.png", SearchOption.AllDirectories);
+
+			assetCount = texPaths.Length;
+
+			// Load all fonts
+			//foreach (var path in fontPaths)
+			//LoadFont(path);
+
+			// Load all textures
 			foreach (var path in texPaths)
 			{
 				LoadTexture(path);
+				Var.game.Render(null, null);
 			}
+
+			loading = false;
 		}
+
 		public static void Clear()
 		{
 			textures.Clear();
@@ -115,9 +198,9 @@ namespace OpenAurora
 		{
 			return null;
 		}
-		public void RemoveFont()
+		public void RemoveFont(Font targetFont)
 		{
-
+			
 		}
 		#endregion
 		#region Audio

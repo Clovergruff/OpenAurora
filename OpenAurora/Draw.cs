@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -45,7 +44,7 @@ namespace OpenAurora
 			this.normal = normal;
 			this.color = color;
 		}
-		public Vertex(Vector3 position, Vector2 texCoord, Vector3 normal, Color color)
+		public Vertex(Vector3 position, Vector2 texCoord, Vector3 normal, Color4 color)
 		{
 			this.position = position;
 			this.texCoord = texCoord;
@@ -104,13 +103,13 @@ namespace OpenAurora
 
 	public class Draw
 	{
-		public static Vector4 ColorToVector4(Color color)
+		public static Vector4 ColorToVector4(Color4 color)
 		{
-			return new Vector4(color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f);
+			return new Vector4(color.R, color.G, color.B, color.A);
 		}
 		public static Color Vector4ToColor(Vector4 vector)
 		{
-			return Color.FromArgb((int)(vector.W * 255), (int)(vector.X * 255), (int)(vector.Y * 255), (int)(vector.Z * 255));
+			return Color.FromArgb((int)(vector.W), (int)(vector.X), (int)(vector.Y), (int)(vector.Z));
 		}
 
 		public static void Rect(Vector2 pos, Vector2 size, float depth, Color col, Texture2D tex = null)
@@ -191,7 +190,7 @@ namespace OpenAurora
 		public static Mesh cube = CreateCube(new Vector3(0, 0, 0), new Vector3(1, 1, 1), Color.White);
 		public static Mesh plane = CreatePlane(new Vector3(0, 0, 0), new Vector3(1, 0, 1), Color.White);
 
-		public static Mesh CreateRectangle(Vector3 pos, Vector3 size, Color col)
+		public static Mesh CreateRectangle(Vector3 pos, Vector3 size, Color4 col)
 		{
 			Vector3 hs = size * 0.5f;
 
@@ -210,7 +209,7 @@ namespace OpenAurora
 			  });
 		}
 
-		public static Mesh CreatePlane(Vector3 pos, Vector3 size, Color col)
+		public static Mesh CreatePlane(Vector3 pos, Vector3 size, Color4 col)
 		{
 			Vector3 hs = size * 0.5f;
 
@@ -229,7 +228,7 @@ namespace OpenAurora
 			  });
 		}
 
-		public static Mesh CreateCube(Vector3 pos, Vector3 size, Color col)
+		public static Mesh CreateCube(Vector3 pos, Vector3 size, Color4 col)
 		{
 			Vector3 hs = size * 0.5f;
 
