@@ -16,6 +16,8 @@ namespace OpenAurora
 		public static KeyboardState state;
 		public static Point mousePosition;
 		public static Vector2 mouseDelta;
+		public static bool cursorLocked = true;
+
 		private static Point oldMousePos = Point.Empty;
 
 		public static bool GetKey(Key key)
@@ -39,6 +41,13 @@ namespace OpenAurora
 			mouseDelta = new Vector2(oldMousePos.X - mousePosition.X, oldMousePos.Y - mousePosition.Y);
 
 			oldMousePos = mousePosition;
+
+			if (cursorLocked)
+			{
+				Point winPos = Game.window.Bounds.Location;
+				Size winSize = Game.window.Bounds.Size;
+				Mouse.SetPosition(winPos.X + winSize.Width / 2, winPos.Y + winSize.Height / 2);
+			}
 		}
 	}
 }

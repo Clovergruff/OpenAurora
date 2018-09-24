@@ -119,6 +119,9 @@ namespace OpenAurora
 		// Update the game
 		void Update(object sender, EventArgs e)
 		{
+			if (!window.Focused)
+				return;
+
 			Time.GetDeltaTime((FrameEventArgs)e);
 
 			// Input
