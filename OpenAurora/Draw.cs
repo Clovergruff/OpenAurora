@@ -117,6 +117,10 @@ namespace OpenAurora
 			
 		}
 
+		public static void ScreenMesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, Texture2D tex = null)
+		{
+			Mesh(mesh, pos * Screen.scaling, rot, scale * Screen.scaling, tex);
+		}
 		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, string texName)
 		{
 			Mesh(mesh, pos, rot, scale, Resources.GetTexture(texName));
@@ -155,8 +159,8 @@ namespace OpenAurora
 
 		public static void Text(Vector2 pos, string text, BitmapFont font, Color4 col)
 		{
-			float u_step = (float)font.glyphWidth / font.atlas.width;
-			float v_step = (float)font.glyphHeight / font.atlas.height;
+			float u_step = ((float)font.glyphWidth / font.atlas.width) * Screen.scaling;
+			float v_step = ((float)font.glyphHeight / font.atlas.height) * Screen.scaling;
 			int xOffset = 0;
 
 			for (int n = 0; n < text.Length; n++)
@@ -165,19 +169,22 @@ namespace OpenAurora
 				float u = (idx % font.glyphsPerLine) * u_step;
 				float v = (idx / font.glyphsPerLine) * v_step;
 
+				float width = font.glyphWidth * Screen.scaling;
+				float height = font.glyphHeight * Screen.scaling;
+
 				Mesh textMesh = new Mesh("TextMesh",
 					new Vertex[4]
 					{
-						new Vertex(new Vector3( pos.X + xOffset, pos.Y, 0),
+						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset, pos.Y * Screen.scaling, 0),
 							new Vector2(u, v),
 							new Vector3(0, 0, -1), col),
-						new Vertex(new Vector3( pos.X + xOffset + font.glyphWidth, pos.Y, 0),
+						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset + width, pos.Y * Screen.scaling, 0),
 							new Vector2(u + u_step, v),
 							new Vector3(0, 0, -1), col),
-						new Vertex(new Vector3( pos.X + xOffset + font.glyphWidth, pos.Y + font.glyphHeight, 0),
+						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset + width, pos.Y * Screen.scaling + height, 0),
 							new Vector2(u + u_step, v + v_step),
 							new Vector3(0, 0, -1), col),
-						new Vertex(new Vector3( pos.X + xOffset, pos.Y + font.glyphHeight, 0),
+						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset, pos.Y * Screen.scaling + height, 0),
 							new Vector2(u, v + v_step),
 							new Vector3(0, 0, -1), col),
 					},
@@ -189,13 +196,15 @@ namespace OpenAurora
 
 				Draw.Mesh(textMesh, Vector3.Zero, Quaternion.Identity, Vector3.One, font.atlas);
 
-				xOffset += font.charSpacing;
+				xOffset += (int)(font.charSpacing * Screen.scaling);
 			}
 		}
 	}
 
 	public class Screen
 	{
+		public static float scaling;
+
 		public static int width
 		{
 			get	{ return Game.window.Width; }
@@ -206,6 +215,17 @@ namespace OpenAurora
 			get	{ return Game.window.Height; }
 			set	{ Game.window.Height = value; }
 		}
+		public static int scaledWidth
+		{
+			get { return (int)(Game.window.Width * scaling); }
+			//set { Game.window.Width = (int)(value / scaling); }
+		}
+		public static int scaledHeight
+		{
+			get { return (int)(Game.window.Height * scaling); }
+			//set { Game.window.Height = (int)(value / scaling); }
+		}
+
 		public static bool fullscreen
 		{
 			get { return Game.window.WindowState == WindowState.Fullscreen; }

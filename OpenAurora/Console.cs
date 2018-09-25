@@ -168,7 +168,7 @@ namespace OpenAurora
 
 			Game.window.CursorVisible = true;
 
-			Draw.Mesh(backRect, new Vector3(Screen.width * 0.5f, height / 2, 0), Quaternion.Identity, new Vector3(Screen.width, height, 0));
+			Draw.ScreenMesh(backRect, new Vector3(Screen.width * 0.5f, height / 2, 0), Quaternion.Identity, new Vector3(Screen.width, height, 0));
 
 			Draw.Text(new Vector2(left, inputTextPos), "/>" + inputText, Resources.systemFont, Color4.White);
 			Draw.Text(new Vector2(left + spacing * 2 + cursorPosition * spacing, inputTextPos), "_", Resources.systemFont, Color4.White);

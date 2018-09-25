@@ -41,8 +41,8 @@ namespace OpenAurora
 
 		public void Generate()
 		{
-			int bitmapWidth = glyphsPerLine * glyphWidth;
-			int bitmapHeight = glyphLineCount * glyphHeight;
+			int bitmapWidth = (int)(glyphsPerLine * glyphWidth * Screen.scaling);
+			int bitmapHeight = (int)(glyphLineCount * glyphHeight * Screen.scaling);
 
 			using (Bitmap bitmap = new Bitmap(bitmapWidth, bitmapHeight, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
 			{
@@ -60,7 +60,7 @@ namespace OpenAurora
 						{
 							char c = (char)(n + p * glyphsPerLine);
 							g.DrawString(c.ToString(), font, Brushes.White,
-								n * glyphWidth + atlasOffsetX, p * glyphHeight + atlassOffsetY);
+								n * glyphWidth * Screen.scaling + atlasOffsetX, p * glyphHeight * Screen.scaling + atlassOffsetY);
 						}
 					}
 				}
