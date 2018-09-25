@@ -37,17 +37,37 @@ namespace OpenAurora
 			window.UpdateFrame += Update;
 			window.RenderFrame += Render;
 			window.Resize += OnResize;
+			window.FocusedChanged += OnFocus;
+			window.KeyPress += OnKeyPress;
+			window.KeyPress += Console.OnKeyPress;
 
 			window.MouseWheel += MouseWheel;
 
 			Console.Enable();
 
 			Input.CalculateMouse();
+			Input.cursorVisible = false;
 		}
 
 		void OnResize(object sender, EventArgs e)
 		{
 			GL.Viewport(0, 0, Screen.width, Screen.height);
+		}
+		void OnFocus(object sender, EventArgs e)
+		{
+			if (!window.Focused)
+				window.CursorVisible = true;
+			else
+			{
+				window.CursorVisible = Input.cursorVisible;
+				Input.oldMousePos = Input.GetMousePosition();
+				Input.mouseDelta = Vector2.Zero;
+			}
+		}
+		void OnKeyPress(object sender, KeyPressEventArgs e)
+		{
+			Input.currentKeyChar = e.KeyChar;
+			// System.Console.WriteLine(Input.currentKeyChar.ToString());
 		}
 
 		// Load resources
@@ -122,6 +142,9 @@ namespace OpenAurora
 			if (!window.Focused)
 				return;
 
+			if (!Console.enabled)
+				window.CursorVisible = Input.cursorVisible;
+
 			Time.GetDeltaTime((FrameEventArgs)e);
 
 			// Input
@@ -134,12 +157,16 @@ namespace OpenAurora
 				entity.Update();
 			}
 
+			// Update the console
+			if (Console.enabled)
+				Console.Update();
+
 			// Base input
 			if (Input.GetKeyDown(Key.Tilde))
 				Console.Toggle();
 
 			if (Input.GetKey(Key.AltLeft) && Input.GetKeyDown(Key.F4))
-				window.Close();
+				Quit();
 
 			if (Input.GetKey(Key.AltLeft) && Input.GetKeyDown(Key.Enter))
 				Screen.ToggleFullScreen();
@@ -196,6 +223,11 @@ namespace OpenAurora
 		{
 			Draw.Mesh(Primitives.CreateRectangle(Vector3.Zero, Vector3.One, new Color4(1, 0, 0, 1)),
 				new Vector3(Screen.width * 0.5f, Screen.height * 0.5f, 0), Quaternion.Identity, new Vector3(Screen.width, Screen.height, 0));
+		}
+
+		public static void Quit()
+		{
+			window.Close();
 		}
 	}
 }

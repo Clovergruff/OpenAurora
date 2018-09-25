@@ -57,8 +57,11 @@ namespace OpenAurora
 
 		void GameControls()
 		{
-			rotSpeed.Y += Input.mouseDelta.X * 300 * Time.deltaTime;
-			rotSpeed.X -= Input.mouseDelta.Y * 300 * Time.deltaTime;
+			if (!Game.window.CursorVisible && !Console.enabled)
+			{
+				rotSpeed.Y += Input.mouseDelta.X * 300 * Time.deltaTime;
+				rotSpeed.X -= Input.mouseDelta.Y * 300 * Time.deltaTime;
+			}
 
 			pitch += rotSpeed.X * Time.deltaTime;
 			yaw += rotSpeed.Y * Time.deltaTime;

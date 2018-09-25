@@ -16,9 +16,11 @@ namespace OpenAurora
 		public static KeyboardState state;
 		public static Point mousePosition;
 		public static Vector2 mouseDelta;
+		public static char currentKeyChar;
 		public static bool cursorLocked = true;
+		public static bool cursorVisible = true;
 
-		private static Point oldMousePos = Point.Empty;
+		public static Point oldMousePos = Point.Empty;
 
 		public static bool GetKey(Key key)
 		{
@@ -35,19 +37,22 @@ namespace OpenAurora
 
 		public static void CalculateMouse()
 		{
-			MouseState mState = Mouse.GetState();
-			mousePosition = Game.window.PointToClient(new Point(mState.X, mState.Y));
-
+			mousePosition = GetMousePosition();
 			mouseDelta = new Vector2(oldMousePos.X - mousePosition.X, oldMousePos.Y - mousePosition.Y);
-
 			oldMousePos = mousePosition;
 
-			if (cursorLocked)
+			if (cursorLocked && !Console.enabled)
 			{
 				Point winPos = Game.window.Bounds.Location;
 				Size winSize = Game.window.Bounds.Size;
 				Mouse.SetPosition(winPos.X + winSize.Width / 2, winPos.Y + winSize.Height / 2);
 			}
+		}
+
+		public static Point GetMousePosition()
+		{
+			MouseState mState = Mouse.GetState();
+			return Game.window.PointToClient(new Point(mState.X, mState.Y));
 		}
 	}
 }

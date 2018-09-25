@@ -152,6 +152,46 @@ namespace OpenAurora
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IBO);
 			GL.DrawElements(PrimitiveType.Triangles, mesh.indices.Length, DrawElementsType.UnsignedInt, 0);
 		}
+
+		public static void Text(Vector2 pos, string text, BitmapFont font, Color4 col)
+		{
+			float u_step = (float)font.glyphWidth / font.atlas.width;
+			float v_step = (float)font.glyphHeight / font.atlas.height;
+			int xOffset = 0;
+
+			for (int n = 0; n < text.Length; n++)
+			{
+				char idx = text[n];
+				float u = (idx % font.glyphsPerLine) * u_step;
+				float v = (idx / font.glyphsPerLine) * v_step;
+
+				Mesh textMesh = new Mesh("TextMesh",
+					new Vertex[4]
+					{
+						new Vertex(new Vector3( pos.X + xOffset, pos.Y, 0),
+							new Vector2(u, v),
+							new Vector3(0, 0, -1), col),
+						new Vertex(new Vector3( pos.X + xOffset + font.glyphWidth, pos.Y, 0),
+							new Vector2(u + u_step, v),
+							new Vector3(0, 0, -1), col),
+						new Vertex(new Vector3( pos.X + xOffset + font.glyphWidth, pos.Y + font.glyphHeight, 0),
+							new Vector2(u + u_step, v + v_step),
+							new Vector3(0, 0, -1), col),
+						new Vertex(new Vector3( pos.X + xOffset, pos.Y + font.glyphHeight, 0),
+							new Vector2(u, v + v_step),
+							new Vector3(0, 0, -1), col),
+					},
+					new uint[6]
+					{
+					0, 1, 2,
+					0, 2, 3,
+					});
+
+				Draw.Mesh(textMesh, Vector3.Zero, Quaternion.Identity, Vector3.One, font.atlas);
+
+				xOffset += font.charSpacing;
+			}
+		}
 	}
 
 	public class Screen

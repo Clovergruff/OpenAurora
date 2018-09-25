@@ -32,7 +32,7 @@ namespace OpenAurora
 
 		void Controls()
 		{
-			if (Game.mode != Game.Mode.Game)
+			if (Console.enabled || Game.mode != Game.Mode.Game)
 				return;
 
 			inputVec = Vector2.Zero;
