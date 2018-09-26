@@ -19,7 +19,7 @@ namespace OpenAurora
 
 			Var.player = this;
 
-			SetModel(Primitives.cube, "Shade");
+			SetModel(Primitives.cube, "Lava");
 			SetTransform(Vector3.Zero, Quaternion.Identity, new Vector3(2, 2, 2));
 		}
 
@@ -56,7 +56,7 @@ namespace OpenAurora
 
 		public override void Render()
 		{
-			Draw.Mesh(mesh, position + new Vector3(0, 1, 0), rotation, scale, texture);
+			Draw.Mesh(Resources.GetMesh("suzanne"), position + new Vector3(0, 1, 0), rotation, scale, texture);
 		}
 	}
 }

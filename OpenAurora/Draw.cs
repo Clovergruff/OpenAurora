@@ -72,11 +72,11 @@ namespace OpenAurora
 	}
 	public class Mesh
 	{
-		public Mesh(string newName, Vertex[] newVerts, uint[] newIds)
+		public Mesh(string newName, Vertex[] verts, uint[] ids)
 		{
 			name = newName;
-			vertices = newVerts;
-			indices = newIds;
+			vertices = verts;
+			indices = ids;
 
 			Bind();
 		}
@@ -127,6 +127,9 @@ namespace OpenAurora
 		}
 		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, Texture2D tex = null)
 		{
+			if (mesh == null)
+				return;
+
 			int texId = 0;
 			if (tex != null)
 				texId = tex.id;

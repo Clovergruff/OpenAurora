@@ -81,9 +81,10 @@ namespace OpenAurora
 
 			GL.Enable(EnableCap.Texture2D);
 
+			Console.Disable();
+
 			Resources.LoadAssets();
 
-			Console.Disable();
 			Start(sender, e);
 
 			// Enable Light 0 and set its parameters.

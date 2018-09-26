@@ -10,6 +10,8 @@ using OpenTK.Graphics.OpenGL;
 using System.IO;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace OpenAurora
 {
@@ -93,6 +95,7 @@ namespace OpenAurora
 			loading = true;
 			string[] fontPaths = Directory.GetFiles("Data/Fonts", "*.ttf", SearchOption.AllDirectories);
 			string[] texPaths = Directory.GetFiles("Data/Textures", "*.png", SearchOption.AllDirectories);
+			string[] modelPaths = Directory.GetFiles("Data/Models", "*.obj", SearchOption.AllDirectories);
 
 			assetCount = texPaths.Length;
 
@@ -101,6 +104,10 @@ namespace OpenAurora
 			//LoadFont(path);
 
 			systemFont = LoadFont("Data/Fonts/Console.ttf");
+
+			// Load all models
+			foreach (var path in modelPaths)
+				LoadMesh(path);
 
 			// Load all textures
 			foreach (var path in texPaths)
@@ -179,15 +186,122 @@ namespace OpenAurora
 		#region Meshes
 		public static Mesh LoadMesh(string filePath)
 		{
-			return null;
-		}
-		public Mesh GetMesh()
-		{
-			return null;
-		}
-		public void RemoveMesh()
-		{
+			string meshName = Path.GetFileNameWithoutExtension(filePath);
+			string meshNameExtension = Path.GetFileName(filePath);
 
+			if (!File.Exists(filePath))
+			{
+				throw new FileNotFoundException("Unable to open \"" + filePath + "\", does not exist.");
+			}
+
+			List<Vector3> positions = new List<Vector3>();
+			List<Vector2> texCoords = new List<Vector2>();
+			List<Vector3> normals = new List<Vector3>();
+			List<uint> indices = new List<uint>();
+			List<uint> uvIndices = new List<uint>();
+
+			using (StreamReader streamReader = new StreamReader(filePath))
+			{
+				while (!streamReader.EndOfStream)
+				{
+					List<string> words = new List<string>(streamReader.ReadLine().ToLower().Split(' '));
+					words.RemoveAll(s => s == string.Empty);
+
+					if (words.Count == 0)
+						continue;
+
+					string type = words[0];
+					words.RemoveAt(0);
+					//Vertex vertex = new Vertex();
+
+					switch (type)
+					{
+						case "o":
+							meshName = words[0];
+							break;
+						// Vertex
+						case "v":
+							positions.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
+							break;
+						// UV
+						case "vt":
+							texCoords.Add(new Vector2(float.Parse(words[0]), float.Parse(words[1])));
+							break;
+						// Normal
+						case "vn":
+							normals.Add(new Vector3(float.Parse(words[0]), float.Parse(words[1]), float.Parse(words[2])));
+							break;
+
+						// Indices
+						case "f":
+							foreach (string w in words)
+							{
+								if (w.Length == 0)
+									continue;
+
+								string[] comps = w.Split('/');
+								if ((comps[0]) == "")
+									continue;
+
+								// subtract 1: indices start from 1, not 0
+
+								indices.Add(uint.Parse(comps[0]) - 1);
+
+								if (comps.Length > 1 && comps[1].Length != 0)
+									uvIndices.Add(uint.Parse(comps[1]) - 1);
+
+								//if (comps.Length > 2)
+									//indices.Add(uint.Parse(comps[2]) - 1);
+							}
+							break;
+
+						default:
+							break;
+					}
+				}
+			}
+
+			// Assemble the mesh
+			int idCount = indices.Count;
+			Vertex[] vertices = new Vertex[positions.Count];
+			for (int i = 0; i < idCount; i++)
+			{
+				int id = (int)indices[i];
+				int uvId = (int)uvIndices[i];
+				vertices[id].position = positions[id];
+				vertices[id].texCoord = texCoords[uvId];
+			
+				//vertices[i].normal = vertNormals[i];
+				vertices[id].color = new Vector4(1, 1, 1, 1);
+			}
+
+			System.Console.WriteLine("Loaded mesh " + meshNameExtension + " as " + meshName);
+
+			var mesh = new Mesh(meshName, vertices, indices.ToArray());
+			meshes.Add(mesh);
+
+			return mesh;
+		}
+
+		public static Mesh GetMesh(string meshName)
+		{
+			foreach (var mesh in meshes)
+			{
+				if (mesh.name == meshName)
+					return mesh;
+			}
+			return null;
+		}
+		public static void RemoveMesh(string meshName)
+		{
+			foreach (var mesh in meshes)
+			{
+				if (mesh.name == meshName)
+				{
+					meshes.Remove(mesh);
+					break;
+				}
+			}
 		}
 		#endregion
 		#region Fonts
