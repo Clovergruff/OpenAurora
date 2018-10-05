@@ -184,6 +184,12 @@ namespace OpenAurora
 		}
 		#endregion
 		#region Meshes
+		public struct Face
+		{
+			public int[] positions;
+			public int[] uvs;
+			public int[] normals;
+		}
 		public static Mesh LoadMesh(string filePath)
 		{
 			string meshName = Path.GetFileNameWithoutExtension(filePath);
@@ -194,11 +200,12 @@ namespace OpenAurora
 				throw new FileNotFoundException("Unable to open \"" + filePath + "\", does not exist.");
 			}
 
+			List<uint> indices = new List<uint>();
 			List<Vector3> positions = new List<Vector3>();
 			List<Vector2> texCoords = new List<Vector2>();
 			List<Vector3> normals = new List<Vector3>();
-			List<uint> indices = new List<uint>();
-			List<uint> uvIndices = new List<uint>();
+
+			List<Face> faces = new List<Face>();
 
 			using (StreamReader streamReader = new StreamReader(filePath))
 			{
@@ -234,25 +241,33 @@ namespace OpenAurora
 
 						// Indices
 						case "f":
-							foreach (string w in words)
+
+							Face face = new Face();
+							int wordCount = words.Count;
+							face.positions = new int[wordCount];
+							face.uvs = new int[wordCount];
+							face.normals = new int[wordCount];
+
+							for (int i = 0; i < wordCount; i++)
 							{
-								if (w.Length == 0)
+								string word = words[i];
+
+								if (word.Length == 0)
 									continue;
 
-								string[] comps = w.Split('/');
-								if ((comps[0]) == "")
+								string[] comps = word.Split('/');
+								if (comps[0] == "")
 									continue;
 
 								// subtract 1: indices start from 1, not 0
+								face.positions[i] = int.Parse(comps[0]) - 1;
+								face.uvs[i] = int.Parse(comps[1]) - 1;
+								face.normals[i] = int.Parse(comps[2]) - 1;
 
-								indices.Add(uint.Parse(comps[0]) - 1);
-
-								if (comps.Length > 1 && comps[1].Length != 0)
-									uvIndices.Add(uint.Parse(comps[1]) - 1);
-
-								//if (comps.Length > 2)
-									//indices.Add(uint.Parse(comps[2]) - 1);
+								indices.Add((uint)face.positions[i]);
 							}
+
+							faces.Add(face);
 							break;
 
 						default:
@@ -262,22 +277,26 @@ namespace OpenAurora
 			}
 
 			// Assemble the mesh
-			int idCount = indices.Count;
 			Vertex[] vertices = new Vertex[positions.Count];
-			for (int i = 0; i < idCount; i++)
+
+			for (int i = 0; i < faces.Count; i++)
 			{
-				int id = (int)indices[i];
-				int uvId = (int)uvIndices[i];
-				vertices[id].position = positions[id];
-				vertices[id].texCoord = texCoords[uvId];
-			
-				//vertices[i].normal = vertNormals[i];
-				vertices[id].color = new Vector4(1, 1, 1, 1);
+				for (int t = 0; t < 3; t++)
+				{
+					int id = faces[i].positions[t];
+					int uvId = faces[i].uvs[t];
+					int normalId = faces[i].normals[t];
+
+					vertices[id].position = positions[id];
+					vertices[id].texCoord = texCoords[uvId];
+					vertices[id].normal = normals[normalId];
+					vertices[id].color = new Vector4(1, 1, 1, 1);
+				}
 			}
 
-			System.Console.WriteLine("Loaded mesh " + meshNameExtension + " as " + meshName);
+			// System.Console.WriteLine("Loaded mesh " + meshNameExtension + " as " + meshName);
 
-			var mesh = new Mesh(meshName, vertices, indices.ToArray());
+			var mesh = new Mesh(meshName, vertices.ToArray(), indices.ToArray());
 			meshes.Add(mesh);
 
 			return mesh;

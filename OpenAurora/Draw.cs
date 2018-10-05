@@ -150,10 +150,14 @@ namespace OpenAurora
 			GL.EnableClientState(ArrayCap.NormalArray);
 			GL.EnableClientState(ArrayCap.IndexArray);
 
-			GL.VertexPointer(3, VertexPointerType.Float, Vertex.SizeInBytes, 0);
-			GL.TexCoordPointer(2, TexCoordPointerType.Float, Vertex.SizeInBytes, Vector3.SizeInBytes);
-			GL.NormalPointer(NormalPointerType.Float, Vertex.SizeInBytes, Vector3.SizeInBytes + Vector2.SizeInBytes);
-			GL.ColorPointer(4, ColorPointerType.Float, Vertex.SizeInBytes, Vector3.SizeInBytes * 2 + Vector2.SizeInBytes);
+			int offset = 0;
+			GL.VertexPointer(3, VertexPointerType.Float, Vertex.SizeInBytes, offset);
+			offset += Vector3.SizeInBytes;
+			GL.TexCoordPointer(3, TexCoordPointerType.Float, Vertex.SizeInBytes, offset);
+			offset += Vector2.SizeInBytes;
+			GL.NormalPointer(NormalPointerType.Float, Vertex.SizeInBytes, offset);
+			offset += Vector3.SizeInBytes;
+			GL.ColorPointer(4, ColorPointerType.Float, Vertex.SizeInBytes, offset);
 
 			GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VBO);
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IBO);

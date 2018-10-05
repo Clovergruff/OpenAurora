@@ -56,7 +56,7 @@ namespace OpenAurora
 
 		public override void Render()
 		{
-			Draw.Mesh(Resources.GetMesh("suzanne"), position + new Vector3(0, 1, 0), rotation, scale, texture);
+			Draw.Mesh(Resources.GetMesh("cube"), position + new Vector3(0, 1, 0), rotation, scale, texture);
 		}
 	}
 }
