@@ -171,6 +171,7 @@ namespace OpenAurora
 
 			return null;
 		}
+
 		public static void RemoveTexture(string texName)
 		{
 			foreach (var tex in textures)
@@ -190,6 +191,7 @@ namespace OpenAurora
 			public int[] uvs;
 			public int[] normals;
 		}
+
 		public static Mesh LoadMesh(string filePath)
 		{
 			string meshName = Path.GetFileNameWithoutExtension(filePath);
@@ -296,7 +298,7 @@ namespace OpenAurora
 
 			// System.Console.WriteLine("Loaded mesh " + meshNameExtension + " as " + meshName);
 
-			var mesh = new Mesh(meshName, vertices.ToArray(), indices.ToArray());
+			var mesh = new Mesh(meshName, vertices, indices.ToArray());
 			meshes.Add(mesh);
 
 			return mesh;
@@ -311,6 +313,7 @@ namespace OpenAurora
 			}
 			return null;
 		}
+
 		public static void RemoveMesh(string meshName)
 		{
 			foreach (var mesh in meshes)
@@ -336,10 +339,12 @@ namespace OpenAurora
 
 			return new BitmapFont(newFont, fontName);
 		}
+
 		public Mesh GetFont()
 		{
 			return null;
 		}
+
 		public void RemoveFont(Font targetFont)
 		{
 			
@@ -352,10 +357,12 @@ namespace OpenAurora
 		{
 			return null;
 		}
+
 		public AnimationClip GetAnimation()
 		{
 			return null;
 		}
+
 		public void RemoveAnimation()
 		{
 
