@@ -34,6 +34,7 @@ namespace OpenAurora
 		{
 			
 		}
+
 		public virtual void Update()
 		{
 
@@ -47,6 +48,7 @@ namespace OpenAurora
 														MathHelper.DegreesToRadians(eulers.Z));
 			scale = sc;
 		}
+
 		public void SetTransform(Vector3 pos, Quaternion rot, Vector3 sc)
 		{
 			position = pos;
@@ -58,6 +60,7 @@ namespace OpenAurora
 		{
 			SetModel(sourceMesh, Resources.GetTexture(texName));
 		}
+
 		public void SetModel(Mesh sourceMesh, Texture2D tex = null)
 		{
 			mesh = new Mesh(sourceMesh.name, sourceMesh.vertices, sourceMesh.indices);

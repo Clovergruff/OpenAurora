@@ -35,6 +35,7 @@ namespace OpenAurora
 			if (Console.enabled || Game.mode != Game.Mode.Game)
 				return;
 
+			float cameraYawRad = MathHelper.DegreesToRadians(Var.camera.yaw);
 			inputVec = Vector2.Zero;
 
 			if (Input.GetKey(Key.A))
@@ -48,15 +49,18 @@ namespace OpenAurora
 				inputVec.Y = 1;
 
 			if (inputVec.Length > 0.1f)
+			{
 				inputVec.Normalize();
+				directionTarget = -Mathf.Vector2AngleInRad(new Vector2(velocity.X, velocity.Z)); //-Mathf.Vector2AngleInRad(inputVec) + cameraYawRad;
+			}
 
 
-			velocity += Quaternion.FromEulerAngles(0, MathHelper.DegreesToRadians(Var.camera.yaw), 0) * new Vector3(inputVec.X, 0, inputVec.Y) * 400 * Time.deltaTime;
+			velocity += Quaternion.FromEulerAngles(0, cameraYawRad, 0) * new Vector3(inputVec.X, 0, inputVec.Y) * 400 * Time.deltaTime;
 		}
 
 		public override void Render()
 		{
-			Draw.Mesh(Resources.GetMesh("cube"), position + new Vector3(0, 1, 0), rotation, scale, texture);
+			Draw.Mesh(Resources.GetMesh("cube"), position + new Vector3(0, 2, 0), rotation, scale, texture);
 		}
 	}
 }

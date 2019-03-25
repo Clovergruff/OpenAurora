@@ -57,6 +57,7 @@ namespace OpenAurora
 	{
 		public Texture2D texture;
 	}
+
 	public class Texture2D
 	{
 		public string name;
@@ -70,6 +71,7 @@ namespace OpenAurora
 			this.height = height;
 		}
 	}
+
 	public class Mesh
 	{
 		public Mesh(string newName, Vertex[] verts, uint[] ids)
@@ -78,7 +80,7 @@ namespace OpenAurora
 			vertices = verts;
 			indices = ids;
 
-			Bind();
+			Generate();
 		}
 
 		public string name;
@@ -87,22 +89,52 @@ namespace OpenAurora
 		public Vertex[] vertices;
 		public uint[] indices;
 
-		public void Bind()
+		public void Generate()
 		{
+			GL.DeleteBuffer(VBO);
 			VBO = GL.GenBuffer();
 			GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
 			GL.BufferData<Vertex>(BufferTarget.ArrayBuffer, (IntPtr)(Vertex.SizeInBytes * vertices.Length),
 				vertices, BufferUsageHint.StaticDraw);
 
+			GL.DeleteBuffer(IBO);
 			IBO = GL.GenBuffer();
 			GL.BindBuffer(BufferTarget.ElementArrayBuffer, IBO);
 			GL.BufferData<uint>(BufferTarget.ElementArrayBuffer, (IntPtr)(sizeof(uint) * indices.Length),
 				indices, BufferUsageHint.StaticDraw);
 		}
+
+		public void Bind()
+		{
+			GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
+			GL.BindBuffer(BufferTarget.ElementArrayBuffer, IBO);
+		}
 	}
 
 	public class Draw
 	{
+		public static Mesh textMesh = new Mesh("TextMesh",
+					new Vertex[4]
+					{
+						new Vertex(new Vector3( 0, 0, 0),
+							new Vector2(0, 0),
+							new Vector3(0, 0, -1), Color.White),
+						new Vertex(new Vector3( 1, 0, 0),
+							new Vector2(1, 0),
+							new Vector3(0, 0, -1), Color.White),
+						new Vertex(new Vector3( 1, 1, 0),
+							new Vector2(1, 1),
+							new Vector3(0, 0, -1), Color.White),
+						new Vertex(new Vector3( 0, 1, 0),
+							new Vector2(0, 1),
+							new Vector3(0, 0, -1), Color.White),
+					},
+					new uint[6]
+					{
+					0, 1, 2,
+					0, 2, 3,
+					});
+
 		public static Vector4 ColorToVector4(Color4 color)
 		{
 			return new Vector4(color.R, color.G, color.B, color.A);
@@ -121,10 +153,12 @@ namespace OpenAurora
 		{
 			Mesh(mesh, pos * Screen.scaling, rot, scale * Screen.scaling, tex);
 		}
+
 		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, string texName)
 		{
 			Mesh(mesh, pos, rot, scale, Resources.GetTexture(texName));
 		}
+
 		public static void Mesh(Mesh mesh, Vector3 pos, Quaternion rot, Vector3 scale, Texture2D tex = null)
 		{
 			if (mesh == null)
@@ -133,6 +167,7 @@ namespace OpenAurora
 			int texId = 0;
 			if (tex != null)
 				texId = tex.id;
+
 			GL.BindTexture(TextureTarget.Texture2D, texId);
 
 			mesh.Bind();
@@ -179,29 +214,23 @@ namespace OpenAurora
 				float width = font.glyphWidth * Screen.scaling;
 				float height = font.glyphHeight * Screen.scaling;
 
-				Mesh textMesh = new Mesh("TextMesh",
-					new Vertex[4]
-					{
-						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset, pos.Y * Screen.scaling, 0),
-							new Vector2(u, v),
-							new Vector3(0, 0, -1), col),
-						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset + width, pos.Y * Screen.scaling, 0),
-							new Vector2(u + u_step, v),
-							new Vector3(0, 0, -1), col),
-						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset + width, pos.Y * Screen.scaling + height, 0),
-							new Vector2(u + u_step, v + v_step),
-							new Vector3(0, 0, -1), col),
-						new Vertex(new Vector3( pos.X * Screen.scaling + xOffset, pos.Y * Screen.scaling + height, 0),
-							new Vector2(u, v + v_step),
-							new Vector3(0, 0, -1), col),
-					},
-					new uint[6]
-					{
-					0, 1, 2,
-					0, 2, 3,
-					});
+				Vector2[] letterUvs = new Vector2[4];
 
-				Draw.Mesh(textMesh, Vector3.Zero, Quaternion.Identity, Vector3.One, font.atlas);
+				letterUvs[0] = new Vector2(u, v);
+				letterUvs[1] = new Vector2(u + u_step, v);
+				letterUvs[2] = new Vector2(u + u_step, v + v_step);
+				letterUvs[3] = new Vector2(u, v + v_step);
+
+				for (int i = 0; i < 4; i++)
+				{
+					textMesh.vertices[i].texCoord = letterUvs[i];
+					textMesh.vertices[i].color = ColorToVector4(col);
+				}
+
+				textMesh.Generate();
+
+				Draw.Mesh(textMesh, new Vector3(pos.X * Screen.scaling + xOffset, pos.Y * Screen.scaling, 0), Quaternion.Identity,
+					new Vector3(width, height, 0), font.atlas);
 
 				xOffset += (int)(font.charSpacing * Screen.scaling);
 			}

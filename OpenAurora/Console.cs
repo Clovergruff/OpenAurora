@@ -33,12 +33,16 @@ namespace OpenAurora
 		private static string inputText = "";
 		private static int cursorPosition;
 
+		private const int lineSpacing = 4;
+
 		private static List<Commands.Command> commands = new List<Commands.Command>
 		{
 			new Commands.ToggleEditor(),
-			new Commands.Godmode(),
 			new Commands.ClearHistory(),
 			new Commands.Exit(),
+
+			new Commands.Godmode(),
+			new Commands.Noclip(),
 		};
 
 		public static void Toggle()
@@ -48,6 +52,7 @@ namespace OpenAurora
 			else
 				Enable();
 		}
+
 		public static void Enable()
 		{
 			if (enabled)
@@ -55,6 +60,7 @@ namespace OpenAurora
 
 			enabled = true;
 		}
+
 		public static void Disable()
 		{
 			if (!enabled)
@@ -90,6 +96,7 @@ namespace OpenAurora
 					MoveCursorBack();
 				}
 			}
+
 			if (Input.GetKeyDown(Key.Delete))
 			{
 				if (Input.GetKey(Key.LShift))
@@ -101,6 +108,7 @@ namespace OpenAurora
 					inputText = inputText.Remove(cursorPosition, 1);
 				}
 			}
+
 			if (Input.GetKeyDown(Key.Left))
 				MoveCursorBack();
 			if (Input.GetKeyDown(Key.Right))
@@ -108,12 +116,21 @@ namespace OpenAurora
 
 			if (Input.GetKeyDown(Key.Enter) || Input.GetKeyDown(Key.KeypadEnter))
 				ExecuteInput();
+
+			int hightChangeSize = Resources.systemFont.size + lineSpacing;
+
+			if (Input.GetKeyDown(Key.PageDown))
+				height += Resources.systemFont.size + lineSpacing;
+			if (Input.GetKeyDown(Key.PageUp) && height > hightChangeSize)
+				height -= Resources.systemFont.size + lineSpacing;
 		}
+
 		private static void MoveCursorBack()
 		{
 			if (cursorPosition > 0)
 				cursorPosition--;
 		}
+
 		private static void MoveCursorForward()
 		{
 			if (cursorPosition < inputText.Length)
@@ -129,11 +146,13 @@ namespace OpenAurora
 		{
 			historyLogs = new List<LogLine>();
 		}
+
 		public static void ClearInput()
 		{
 			inputText = "";
 			cursorPosition = 0;
 		}
+
 		private static void ExecuteInput()
 		{
 			bool commandExecuted = false;
@@ -165,6 +184,7 @@ namespace OpenAurora
 			int lineHeight = Resources.systemFont.size;
 			int left = 2;
 			int inputTextPos = (int)height - lineHeight;
+			int spacedLineHeight = lineHeight + lineSpacing;
 
 			Game.window.CursorVisible = true;
 
@@ -176,8 +196,8 @@ namespace OpenAurora
 			// History
 			for (int i = 0; i < historyLogs.Count; i++)
 			{
-				float yPos = inputTextPos - lineHeight * (historyLogs.Count + 1) + lineHeight * (i + 1);
-				if (yPos > -lineHeight)
+				float yPos = inputTextPos - spacedLineHeight * (historyLogs.Count + 1) + spacedLineHeight * (i + 1);
+				if (yPos > -spacedLineHeight)
 				{
 					var line = historyLogs[i];
 					Draw.Text(new Vector2(left, yPos), line.text, Resources.systemFont, line.color);
@@ -194,6 +214,7 @@ namespace OpenAurora
 			public string key = "";
 			public virtual void Execute() { }
 		}
+
 		public class ToggleEditor : Command
 		{
 			public ToggleEditor() { key = "editor"; }
@@ -203,23 +224,15 @@ namespace OpenAurora
 				switch (Game.mode)
 				{
 					case Game.Mode.Game:
-						Console.WriteLine("Game mode enabled", Color4.Yellow);
+						Console.WriteLine("Game mode Enabled", Color4.Yellow);
 						break;
 					case Game.Mode.Editor:
-						Console.WriteLine("Edit mode enabled", Color4.Yellow);
+						Console.WriteLine("Edit mode Enabled", Color4.Yellow);
 						break;
 				}
 			}
 		}
-		public class Godmode : Command
-		{
-			public Godmode() { key = "god";	}
-			public override void Execute()
-			{
-				Cheats.godmode = !Cheats.godmode;
-				Console.WriteLine("God mode set to " + Cheats.godmode, Color4.Yellow);
-			}
-		}
+
 		public class ClearHistory : Command
 		{
 			public ClearHistory() { key = "cls"; }
@@ -228,6 +241,7 @@ namespace OpenAurora
 				Console.Clear();
 			}
 		}
+
 		public class Exit : Command
 		{
 			public Exit() { key = "exit"; }
@@ -236,10 +250,49 @@ namespace OpenAurora
 				Game.Quit();
 			}
 		}
+
+		public class SetTimeScale : Command
+		{
+			public SetTimeScale() { key = "time scale"; }
+			public override void Execute()
+			{
+			}
+		}
+
+		#region Cheats
+		public class Godmode : Command
+		{
+			public Godmode() { key = "god"; }
+			public override void Execute()
+			{
+				Cheats.godmode = !Cheats.godmode;
+				Console.WriteLine("God mode " + GetToggleModifier(Cheats.godmode), Color4.Yellow);
+			}
+		}
+
+		public class Noclip : Command
+		{
+			public Noclip() { key = "noclip"; }
+			public override void Execute()
+			{
+				Cheats.noclip = !Cheats.noclip;
+				Console.WriteLine("Noclip " + GetToggleModifier(Cheats.noclip), Color4.Yellow);
+			}
+		}
+		#endregion
+
+		public static string GetToggleModifier(bool b)
+		{
+			if (b)
+				return "Enabled";
+			else
+				return "Disabled";
+		}
 	}
 
 	public class Cheats
 	{
 		public static bool godmode;
+		public static bool noclip;
 	}
 }

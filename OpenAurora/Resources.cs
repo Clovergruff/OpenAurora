@@ -151,8 +151,6 @@ namespace OpenAurora
 			GL.TexParameter(TextureTarget.Texture2D,
 				TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
 
-			// GL.BindTexture(TextureTarget.Texture2D, 0);
-
 			Texture2D tex = new Texture2D(id, bitmap.Width, bitmap.Height);
 			tex.name = Path.GetFileNameWithoutExtension(filePath);
 
@@ -244,32 +242,36 @@ namespace OpenAurora
 						// Indices
 						case "f":
 
-							Face face = new Face();
 							int wordCount = words.Count;
-							face.positions = new int[wordCount];
-							face.uvs = new int[wordCount];
-							face.normals = new int[wordCount];
-
-							for (int i = 0; i < wordCount; i++)
+							if (wordCount > 1)
 							{
-								string word = words[i];
+								Face face = new Face();
 
-								if (word.Length == 0)
-									continue;
+								face.positions = new int[wordCount];
+								face.uvs = new int[wordCount];
+								face.normals = new int[wordCount];
 
-								string[] comps = word.Split('/');
-								if (comps[0] == "")
-									continue;
+								for (int i = 0; i < wordCount; i++)
+								{
+									string word = words[i];
 
-								// subtract 1: indices start from 1, not 0
-								face.positions[i] = int.Parse(comps[0]) - 1;
-								face.uvs[i] = int.Parse(comps[1]) - 1;
-								face.normals[i] = int.Parse(comps[2]) - 1;
+									if (word.Length == 0)
+										continue;
 
-								indices.Add((uint)face.positions[i]);
+									string[] comps = word.Split('/');
+									if (comps[0] == "")
+										continue;
+
+									// subtract 1: indices start from 1, not 0
+									face.positions[i] = int.Parse(comps[0]) - 1;
+									face.uvs[i] = int.Parse(comps[1]) - 1;
+									face.normals[i] = int.Parse(comps[2]) - 1;
+
+									indices.Add((uint)face.positions[i]);
+								}
+
+								faces.Add(face);
 							}
-
-							faces.Add(face);
 							break;
 
 						default:

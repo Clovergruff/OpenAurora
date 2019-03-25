@@ -59,6 +59,8 @@
     <Compile Include="Entity.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="Map.cs" />
+    <Compile Include="Math\Mathf.cs" />
     <Compile Include="Pawn.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
@@ -388,7 +390,6 @@
     <Folder Include="Data\Models\Objects\Containers\" />
     <Folder Include="Data\Models\Pawns\Helper\" />
     <Folder Include="Data\Models\Pawns\Shade\" />
-    <Folder Include="Math\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
